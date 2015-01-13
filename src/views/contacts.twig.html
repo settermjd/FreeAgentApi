@@ -1,0 +1,18 @@
+<h1>Contacts</h1>
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Url</th>
+    </tr>
+{% for contact in contacts %}
+    <tr>
+        <td>{{ contact.first_name }} {{ contact.last_name }}</td>
+        <td>{{ contact.url }}</td>
+    </tr>
+{% else %}
+    <tr>
+        <td colspan="2">No contacts have been found.</td>
+    </tr>
+{% endfor %}
+</table>
