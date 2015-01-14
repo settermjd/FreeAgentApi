@@ -1,2 +1,18 @@
 <h1>Trial Balance</h1>
 
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Total</th>
+    </tr>
+    {% for category in categories %}
+    <tr>
+        <td>{{ category.name }}</td>
+        <td>{{ contact.total }}</td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="2">No trial balance information is available.</td>
+    </tr>
+    {% endfor %}
+</table>
