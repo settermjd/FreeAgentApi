@@ -86,13 +86,15 @@ class FreeAgentApi
      * @return array
      * @throws \OAuth2\Exception
      */
-    protected function makeRequest($apiPath, $apiParams = array(), $requestMethod = "GET")
+    protected function makeRequest($apiPath, $apiParams = array(), $requestMethod = "GET", $headers)
     {
+        $default = array('User-Agent' => 'Example app');
+        $headers = array_merge($default, $headers);
         return $this->client->fetch(
             self::BASEURL . $apiPath,
             $apiParams,
             $requestMethod,
-            array('User-Agent' => 'Example app')
+            $headers
         );
     }
 
@@ -191,7 +193,7 @@ class FreeAgentApi
                 'comments' => 'added by API',
                 'invoice_items' => array(
                     array(
-                        'item_type' => 'products',
+                        'item_type' => 'Products',
                         'quantity' => '1.0',
                         'price' => '100.0',
                         'description' => 'a simple product',
@@ -205,7 +207,7 @@ class FreeAgentApi
             json_encode($requestData),
             "POST",
             array(
-                "Content-Type: application/json"
+                'Content-Type' => 'application/json',
             )
         );
 
