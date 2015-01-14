@@ -1,0 +1,22 @@
+<h1>Expenses</h1>
+
+<table>
+    <tr>
+        <th>Due Date</th>
+        <th>Reference</th>
+        <th>Currency</th>
+        <th>Total Value</th>
+    </tr>
+    {% for expense in expenses %}
+    <tr>
+        <td>{{ expense.dated_on }}</td>
+        <td>{{ expense.currency }}</td>
+        <td>{{ expense.sales_tax_value }}</td>
+        <td>{{ expense.gross_value }}</td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="2">No expense information is available.</td>
+    </tr>
+    {% endfor %}
+</table>

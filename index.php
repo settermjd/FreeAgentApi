@@ -27,22 +27,13 @@ $app->get('/', function () use ($app) {
 });
 
 $app->get('/contacts/:contactType', function ($contactType) use($app) {
-    echo "<h1>Expenses</h1>";
     $contacts = $app->apiClient->getContacts($contactType);
     $app->render('contacts.twig.html',['contacts' => $contacts]);
 });
 
 $app->get('/list-expenses', function () use($app) {
-    echo "<h1>Expenses</h1>";
-    $expenses = $app->apiClient->getExpenses();
-    if (count($expenses)) {
-        foreach ($expenses as $expense) {
-            printf ("Currency: %s, Gross Value: %s<br />",
-                $expense['currency'],
-                $expense['gross_value']
-            );
-        }
-    }
+    $response = $app->apiClient->getExpenses();
+    $app->render('expenses.twig.html',['expenses' => $response]);
 });
 
 $app->get('/trial-balance', function () use($app) {
