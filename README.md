@@ -1,7 +1,8 @@
 # FreeAgentApi
 
-This is a simple repository, designed for use with the January 2015 edition of PHP Architect 
-magazine’s Education Station column, showing how to interact with the FreeAgentAPI using PHP.
+This is a simple repository, designed for use with the January 2015 edition of [PHP Architect]
+(http://phparch.com) magazine’s Education Station column, showing how to interact with the 
+FreeAgentAPI using PHP.
 
 ## Getting Started
 
