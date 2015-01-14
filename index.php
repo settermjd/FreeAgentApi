@@ -23,7 +23,7 @@ $view->parserExtensions = array(
 $app->apiClient = new ApiClient();
 
 $app->get('/', function () use ($app) {
-    $app->render('index.twig.html',['hello' => 'hello world']);
+    $app->render('index.twig.html');
 });
 
 $app->get('/contacts/:contactType', function ($contactType) use($app) {
