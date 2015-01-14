@@ -38,12 +38,12 @@ $app->get('/list-expenses', function () use($app) {
 
 $app->get('/trial-balance', function () use($app) {
     $response = $app->apiClient->getTrialBalance();
-    $app->render('trial-balance.twig.html',['hello' => 'hello world']);
+    $app->render('trial-balance.twig.html',['categories' => $response]);
 });
 
 $app->get('/invoices', function () use($app) {
     $response = $app->apiClient->getInvoices();
-    $app->render('invoices.twig.html',['hello' => 'hello world']);
+    $app->render('invoices.twig.html',['invoices' => $response]);
 });
 
 $app->get('/invoice/create/:contactId', function ($contactId) use($app) {

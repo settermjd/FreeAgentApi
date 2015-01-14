@@ -1,2 +1,24 @@
 <h1>Invoices</h1>
 
+<table>
+    <tr>
+        <th>Due Date</th>
+        <th>Reference</th>
+        <th>Currency</th>
+        <th>Total Value</th>
+        <th>Payment Terms</th>
+    </tr>
+    {% for invoice in invoices %}
+    <tr>
+        <td>{{ invoice.due_on }}</td>
+        <td>{{ invoice.reference }}</td>
+        <td>{{ invoice.currency }}</td>
+        <td>{{ invoice.total_value }}</td>
+        <td>{{ invoice.payment_terms_in_days }}</td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="2">No invoice information is available.</td>
+    </tr>
+    {% endfor %}
+</table>
