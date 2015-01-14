@@ -30,7 +30,7 @@ $app->get('/', function () use ($app) {
     $app->render('index.twig.html');
 });
 
-$app->get('/contacts/:contactType', function ($contactType) use($app) {
+$app->get('/contacts/:contactType', function ($contactType) use($app) {    
     $contacts = $app->apiClient->getContacts($contactType);
     $app->render('contacts.twig.html',['contacts' => $contacts]);
 });

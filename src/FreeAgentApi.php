@@ -113,7 +113,9 @@ class FreeAgentApi
             "GET"
         );
 
-        return $response['result']['contacts'];
+        if (isset($response['result']['contacts'])) {
+            return $response['result']['contacts'];
+        }
     }
 
     /**
@@ -200,7 +202,7 @@ class FreeAgentApi
 
         $response = $this->makeRequest(
             '/invoices',
-            $requestData,
+            json_encode($requestData),
             "POST",
             array(
                 "Content-Type: application/json"
