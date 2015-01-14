@@ -12,8 +12,14 @@ class FreeAgentApi
 
     const SECRET = '';
 
+    /**
+     * @var Oauth2client
+     */
     protected $_client;
 
+    /**
+     * @var string
+     */
     protected $_scriptUrl;
 
     public function __construct()
@@ -107,7 +113,6 @@ class FreeAgentApi
             ),
             "GET"
         );
-
         return $response['result']['expenses'];
     }
 
