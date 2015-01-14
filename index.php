@@ -1,7 +1,7 @@
 <?php
 
 require_once('vendor/autoload.php');
-
+session_start();
 use FreeAgentApi\FreeAgentApi as ApiClient;
 
 $app = new \Slim\Slim(array(
@@ -20,7 +20,11 @@ $view->parserExtensions = array(
     new \Slim\Views\TwigExtension(),
 );
 
-$app->apiClient = new ApiClient();
+
+$identifier = 'YOUR_IDENTIFIER';
+$secret = 'YOUR_SECRET';
+
+$app->apiClient = new ApiClient($identifier, $secret);
 
 $app->get('/', function () use ($app) {
     $app->render('index.twig.html');

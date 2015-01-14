@@ -8,54 +8,70 @@ class FreeAgentApi
 {
     const BASEURL = 'https://api.freeagent.com/v2';
 
-    const IDENTIFIER = '';
-
-    const SECRET = '';
-
     /**
-     * @var Oauth2client
+     * @var string
      */
-    protected $_client;
+    protected $identifier;
 
     /**
      * @var string
      */
-    protected $_scriptUrl;
+    protected $secret;
 
-    public function __construct()
+    /**
+     * @var Oauth2client
+     */
+    protected $client;
+
+    /**
+     * @var string
+     */
+    protected $scriptUrl;
+
+    public function __construct($identifier, $secret)
     {
-        $this->_client = new OAuth2Client(self::IDENTIFIER, self::SECRET);
-        $this->_scriptUrl = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
-        $this->_initClient();
+        $this->identifier = $identifier;
+        $this->secret = $secret;
+
+        $this->client = new OAuth2Client($this->identifier, $this->secret);
+        $this->scriptUrl = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
+        $this->initClient();
         setlocale(LC_MONETARY, 'de_DE');
     }
 
-    protected function _initClient()
+    protected function initClient()
     {
-        if (empty($_GET['code']) && empty($_GET['token'])) {
-            $auth_url = $this->_client->getAuthenticationUrl(
+        if (empty($_SESSION['token']) && empty($_GET['code']) && empty($_GET['token'])) {
+            $auth_url = $this->client->getAuthenticationUrl(
                 self::BASEURL . '/approve_app',
-                $this->_scriptUrl
+                $this->scriptUrl
             );
             header('Location: ' . $auth_url);
             exit;
         } elseif (isset($_GET['code'])) {
-            $response = $this->_client->getAccessToken(
+            $response = $this->client->getAccessToken(
                 self::BASEURL . '/token_endpoint',
                 'authorization_code',
                 array(
                     'code' => $_GET['code'],
-                    'redirect_uri' => $this->_scriptUrl
+                    'redirect_uri' => $this->scriptUrl
                 )
             );
-
+            
             $token = $response['result']['access_token'];
+            $_SESSION['token'] = $token;
             header(
-                'Location: ' . $this->_scriptUrl . '?token=' . $token
+                'Location: ' . $this->scriptUrl . '?token=' . $token
             );
+            exit();
         } elseif (isset($_GET['token'])) {
-            $this->_client->setAccessToken($_GET['token']);
-            $this->_client->setAccessTokenType(
+            $this->client->setAccessToken($_GET['token']);
+            $this->client->setAccessTokenType(
+                OAuth2Client::ACCESS_TOKEN_BEARER
+            );
+        } elseif (isset($_SESSION['token'])) {
+            $this->client->setAccessToken($_SESSION['token']);
+            $this->client->setAccessTokenType(
                 OAuth2Client::ACCESS_TOKEN_BEARER
             );
         }
@@ -72,7 +88,7 @@ class FreeAgentApi
      */
     protected function makeRequest($apiPath, $apiParams = array(), $requestMethod = "GET")
     {
-        return $this->_client->fetch(
+        return $this->client->fetch(
             self::BASEURL . $apiPath,
             $apiParams,
             $requestMethod,
