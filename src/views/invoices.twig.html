@@ -2,6 +2,7 @@
 
 <table>
     <tr>
+        <th>Invoice Id</th>
         <th>Due Date</th>
         <th>Reference</th>
         <th>Currency</th>
@@ -10,7 +11,7 @@
     </tr>
     {% for invoice in invoices %}
     <tr>
-        <td>{{ invoice.due_on }}</td>
+        <td>{{ invoice.url }}</td>
         <td>{{ invoice.reference }}</td>
         <td>{{ invoice.currency }}</td>
         <td>{{ invoice.total_value }}</td>

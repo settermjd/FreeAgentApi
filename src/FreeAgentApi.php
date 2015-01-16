@@ -194,7 +194,7 @@ class FreeAgentApi
                 'comments' => 'added by API',
                 'invoice_items' => array(
                     array(
-                        'item_type' => 'products',
+                        'item_type' => 'Products',
                         'quantity' => '1.0',
                         'price' => '100.0',
                         'description' => 'a simple product',
@@ -222,22 +222,25 @@ class FreeAgentApi
     {
         $requestData = array(
             'contact' => 'https://api.freeagent.com/v2/contacts/' . $contactId,
-            'dated_on' => '2015-01-13T00:00:00+00:00',
+            'dated_on' => '2015-01-13',
             'currency' => 'GBP',
             'payment_terms_in_days' => 30,
-            'ec_status' => 'non-ec',
+            'ec_status' => 'Non-EC',
             'exchange_rate' => '1.1',
             'reference' => '001',
             'status' => 'Draft',
             'invoice_items' => array(
                 array(
-                    'item_type' => 'products',
+                    'id' => '1',
+                    'position' => '1',
+                    'item_type' => 'Products',
                     'quantity' => '1.0',
-                    'price' => '100.0',
+                    'price' => '200.0',
                     'description' => 'a simple product',
                 ),
                 array(
-                    'item_type' => 'hours',
+                    'position' => '2',
+                    'item_type' => 'Hours',
                     'quantity' => '3.0',
                     'price' => '200.0',
                     'description' => 'a simple set of billable hours',
