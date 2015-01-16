@@ -1,7 +1,7 @@
 <?php
 
 require_once('vendor/autoload.php');
-
+session_start();
 use FreeAgentApi\FreeAgentApi as ApiClient;
 
 $app = new \Slim\Slim(array(
@@ -20,13 +20,17 @@ $view->parserExtensions = array(
     new \Slim\Views\TwigExtension(),
 );
 
-$app->apiClient = new ApiClient();
+
+$identifier = 'YOUR_IDENTIFIER';
+$secret = 'YOUR_SECRET';
+
+$app->apiClient = new ApiClient($identifier, $secret);
 
 $app->get('/', function () use ($app) {
     $app->render('index.twig.html');
 });
 
-$app->get('/contacts/:contactType', function ($contactType) use($app) {
+$app->get('/contacts/:contactType', function ($contactType) use($app) {    
     $contacts = $app->apiClient->getContacts($contactType);
     $app->render('contacts.twig.html',['contacts' => $contacts]);
 });
@@ -51,8 +55,8 @@ $app->get('/invoice/create/:contactId', function ($contactId) use($app) {
     print_r($response);
 });
 
-$app->get('/invoice/update/:invoiceId', function ($invoiceId) use($app) {
-    $response = $app->apiClient->updateInvoice($invoiceId);
+$app->get('/invoice/update/:invoiceId/:contactId', function ($invoiceId, $contactId) use($app) {
+    $response = $app->apiClient->updateInvoice($invoiceId, $contactId);
     print_r($response);
 });
 

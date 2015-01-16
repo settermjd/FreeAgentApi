@@ -8,54 +8,70 @@ class FreeAgentApi
 {
     const BASEURL = 'https://api.freeagent.com/v2';
 
-    const IDENTIFIER = '';
-
-    const SECRET = '';
-
     /**
-     * @var Oauth2client
+     * @var string
      */
-    protected $_client;
+    protected $identifier;
 
     /**
      * @var string
      */
-    protected $_scriptUrl;
+    protected $secret;
 
-    public function __construct()
+    /**
+     * @var Oauth2client
+     */
+    protected $client;
+
+    /**
+     * @var string
+     */
+    protected $scriptUrl;
+
+    public function __construct($identifier, $secret)
     {
-        $this->_client = new OAuth2Client(self::IDENTIFIER, self::SECRET);
-        $this->_scriptUrl = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
-        $this->_initClient();
+        $this->identifier = $identifier;
+        $this->secret = $secret;
+
+        $this->client = new OAuth2Client($this->identifier, $this->secret);
+        $this->scriptUrl = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
+        $this->initClient();
         setlocale(LC_MONETARY, 'de_DE');
     }
 
-    protected function _initClient()
+    protected function initClient()
     {
-        if (empty($_GET['code']) && empty($_GET['token'])) {
-            $auth_url = $this->_client->getAuthenticationUrl(
+        if (empty($_SESSION['token']) && empty($_GET['code']) && empty($_GET['token'])) {
+            $auth_url = $this->client->getAuthenticationUrl(
                 self::BASEURL . '/approve_app',
-                $this->_scriptUrl
+                $this->scriptUrl
             );
             header('Location: ' . $auth_url);
             exit;
         } elseif (isset($_GET['code'])) {
-            $response = $this->_client->getAccessToken(
+            $response = $this->client->getAccessToken(
                 self::BASEURL . '/token_endpoint',
                 'authorization_code',
                 array(
                     'code' => $_GET['code'],
-                    'redirect_uri' => $this->_scriptUrl
+                    'redirect_uri' => $this->scriptUrl
                 )
             );
-
+            
             $token = $response['result']['access_token'];
+            $_SESSION['token'] = $token;
             header(
-                'Location: ' . $this->_scriptUrl . '?token=' . $token
+                'Location: ' . $this->scriptUrl . '?token=' . $token
             );
+            exit();
         } elseif (isset($_GET['token'])) {
-            $this->_client->setAccessToken($_GET['token']);
-            $this->_client->setAccessTokenType(
+            $this->client->setAccessToken($_GET['token']);
+            $this->client->setAccessTokenType(
+                OAuth2Client::ACCESS_TOKEN_BEARER
+            );
+        } elseif (isset($_SESSION['token'])) {
+            $this->client->setAccessToken($_SESSION['token']);
+            $this->client->setAccessTokenType(
                 OAuth2Client::ACCESS_TOKEN_BEARER
             );
         }
@@ -70,13 +86,16 @@ class FreeAgentApi
      * @return array
      * @throws \OAuth2\Exception
      */
-    protected function makeRequest($apiPath, $apiParams = array(), $requestMethod = "GET")
+    protected function makeRequest($apiPath, $apiParams = array(), $requestMethod = "GET", $headers = array())
     {
-        return $this->_client->fetch(
+        $default = array('User-Agent' => 'PHP Arch Application');
+        $headers = array_merge($default, $headers);
+
+        return $this->client->fetch(
             self::BASEURL . $apiPath,
             $apiParams,
             $requestMethod,
-            array('User-Agent' => 'Example app')
+            $headers
         );
     }
 
@@ -97,7 +116,9 @@ class FreeAgentApi
             "GET"
         );
 
-        return $response['result']['contacts'];
+        if (isset($response['result']['contacts'])) {
+            return $response['result']['contacts'];
+        }
     }
 
     /**
@@ -173,7 +194,7 @@ class FreeAgentApi
                 'comments' => 'added by API',
                 'invoice_items' => array(
                     array(
-                        'item_type' => 'products',
+                        'item_type' => 'Products',
                         'quantity' => '1.0',
                         'price' => '100.0',
                         'description' => 'a simple product',
@@ -184,10 +205,10 @@ class FreeAgentApi
 
         $response = $this->makeRequest(
             '/invoices',
-            $requestData,
+            json_encode($requestData),
             "POST",
             array(
-                "Content-Type: application/json"
+                "Content-Type" => "application/json"
             )
         );
 
@@ -201,22 +222,25 @@ class FreeAgentApi
     {
         $requestData = array(
             'contact' => 'https://api.freeagent.com/v2/contacts/' . $contactId,
-            'dated_on' => '2015-01-13T00:00:00+00:00',
+            'dated_on' => '2015-01-13',
             'currency' => 'GBP',
             'payment_terms_in_days' => 30,
-            'ec_status' => 'non-ec',
+            'ec_status' => 'Non-EC',
             'exchange_rate' => '1.1',
             'reference' => '001',
             'status' => 'Draft',
             'invoice_items' => array(
                 array(
-                    'item_type' => 'products',
+                    'id' => '1',
+                    'position' => '1',
+                    'item_type' => 'Products',
                     'quantity' => '1.0',
-                    'price' => '100.0',
+                    'price' => '200.0',
                     'description' => 'a simple product',
                 ),
                 array(
-                    'item_type' => 'hours',
+                    'position' => '2',
+                    'item_type' => 'Hours',
                     'quantity' => '3.0',
                     'price' => '200.0',
                     'description' => 'a simple set of billable hours',
@@ -226,8 +250,11 @@ class FreeAgentApi
 
         $response = $this->makeRequest(
             '/invoices/' . $invoiceId,
-            $requestData,
-            "PUT"
+            json_encode($requestData),
+            "PUT",
+            array(
+                "Content-Type" => "application/json"
+            )
         );
 
         return $response;
@@ -239,7 +266,8 @@ class FreeAgentApi
     public function deleteInvoice($invoiceId)
     {
         return $this->makeRequest(
-            '/estimates/' . $invoiceId,
+            '/invoices/' . $invoiceId,
+            json_encode(array()),
             "DELETE"
         );
     }
