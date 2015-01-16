@@ -86,13 +86,16 @@ class FreeAgentApi
      * @return array
      * @throws \OAuth2\Exception
      */
-    protected function makeRequest($apiPath, $apiParams = array(), $requestMethod = "GET")
+    protected function makeRequest($apiPath, $apiParams = array(), $requestMethod = "GET", $headers = array())
     {
+        $default = array('User-Agent' => 'PHP Arch Application');
+        $headers = array_merge($default, $headers);
+
         return $this->client->fetch(
             self::BASEURL . $apiPath,
             $apiParams,
             $requestMethod,
-            array('User-Agent' => 'Example app')
+            $headers
         );
     }
 
@@ -205,7 +208,7 @@ class FreeAgentApi
             json_encode($requestData),
             "POST",
             array(
-                "Content-Type: application/json"
+                "Content-Type" => "application/json"
             )
         );
 
@@ -244,8 +247,11 @@ class FreeAgentApi
 
         $response = $this->makeRequest(
             '/invoices/' . $invoiceId,
-            $requestData,
-            "PUT"
+            json_encode($requestData),
+            "PUT",
+            array(
+                "Content-Type" => "application/json"
+            )
         );
 
         return $response;
@@ -257,7 +263,8 @@ class FreeAgentApi
     public function deleteInvoice($invoiceId)
     {
         return $this->makeRequest(
-            '/estimates/' . $invoiceId,
+            '/invoices/' . $invoiceId,
+            json_encode(array()),
             "DELETE"
         );
     }
