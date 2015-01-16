@@ -55,8 +55,8 @@ $app->get('/invoice/create/:contactId', function ($contactId) use($app) {
     print_r($response);
 });
 
-$app->get('/invoice/update/:invoiceId', function ($invoiceId) use($app) {
-    $response = $app->apiClient->updateInvoice($invoiceId);
+$app->get('/invoice/update/:invoiceId/:contactId', function ($invoiceId, $contactId) use($app) {
+    $response = $app->apiClient->updateInvoice($invoiceId, $contactId);
     print_r($response);
 });
 
